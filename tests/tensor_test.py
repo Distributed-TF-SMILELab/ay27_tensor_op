@@ -1,10 +1,16 @@
 # Created by ay27 at 16/11/8
 import unittest
 import numpy as np
+
 from src.tensor import Tensor
 
 
-class MyTestCase(np.testing.TestCase):
+class TensorTest(np.testing.TestCase):
+    def test_value(self):
+        with self.assertRaises(ValueError):
+            t = Tensor((1, 2, 3))
+        t = Tensor([_ for _ in range(100)])
+
     def test_t2mat(self):
         # shape of tmp 3x4x2
         tmp = [[[1, 13], [4, 16], [7, 19], [10, 22]],
@@ -27,6 +33,16 @@ class MyTestCase(np.testing.TestCase):
         Y = np.transpose(X, [2, 1, 0])
         Z = Y.reshape([2, 12])
         np.testing.assert_array_equal(Z, t.t2mat(2, [1, 0]))
+
+        try:
+            t.t2mat([2, 3], [4, 5])
+        except:
+            self.assertTrue(True)
+
+        try:
+            t.t2mat(3, [0, 1, 2])
+        except:
+            self.assertTrue(True)
 
 
 if __name__ == '__main__':
