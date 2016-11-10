@@ -75,6 +75,8 @@ class TensorTest(np.testing.TestCase):
         x = reduce(lambda x, y: x + y, np.power(self.X.reshape(-1), 4))
         self.assertAlmostEqual(pow(self.t.norm(4), 4), x)
 
+    def test_inner(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
