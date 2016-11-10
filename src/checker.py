@@ -2,11 +2,11 @@
 import functools
 
 
-def arg_check(*args):
+def type_check(*args):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*inner_args, **kw):
-            for ii in range(len(args)):
+            for ii in range(min(len(args), len(inner_args))):
                 if args[ii] is None:
                     continue
                 if isinstance(args[ii], list) or isinstance(args[ii], tuple):
