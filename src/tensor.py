@@ -1,6 +1,4 @@
 # Created by ay27 at 16/11/8
-from functools import reduce
-
 import numpy as np
 import tensorflow as tf
 from src.checker import type_check
@@ -11,9 +9,12 @@ class Tensor:
     def __init__(self, data):
         self.data = np.array(data, dtype=np.float64)
         self.shape = self.data.shape
+        self.__vec__ = None
 
     def vectorization(self):
-        return self.data.reshape(-1)
+        if self.__vec__ is None:
+            self.__vec__ = self.data.reshape(-1)
+        return self.__vec__
 
     @type_check(None, [list, int], [list, int])
     def t2mat(self, rdims, cdims):

@@ -5,10 +5,14 @@ python:
 
 dist: trusty
 sudo: false
-group: beta
 
 install:
   - pip install -r requirements.txt
   - pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0rc2-cp35-cp35m-linux_x86_64.whl
+  - pip install coveralls
+  - pip install coverage
 # command to run tests
-script: python test.py
+script:
+  coverage run test.py
+after_success:
+  coveralls
