@@ -1,6 +1,5 @@
 # Created by ay27 at 16/11/8
 import numpy as np
-import tensorflow as tf
 from src.checker import type_check
 
 
@@ -30,7 +29,8 @@ class Tensor:
         else:
             indies.extend(cdims)
             csize = np.prod([self.shape[i] for i in cdims])
-        tmp = tf.reshape(tf.transpose(self.data, indies), (rsize, csize))
+        tmp = np.reshape(np.transpose(self.data, indies), (rsize, csize))
+
         return tmp
 
     def inner(self, B):
@@ -38,7 +38,7 @@ class Tensor:
             raise ValueError('B must be a Tensor object')
         if not np.array_equal(self.shape, B.shape):
             raise ValueError('the shape of B must be equal as self')
-        return self.vectorization() * B.vectorization()
+        return np.inner(self.vectorization(), B.vectorization())
 
     @type_check(None, int)
     def norm(self, p=2):
@@ -46,9 +46,16 @@ class Tensor:
 
     @type_check(None, [np.ndarray, np.matrix], int)
     def tmul(self, U, axis=0):
-        pass
+        indies = list(range(len(self.shape)))
+        indies[0], indies[axis] = indies[axis], indies[0]
 
-    def __cmp__(self, other):
+        tmp = self.t2mat(axis, indies[1:])
+        tmp = np.matmul(U, tmp)
+        back_shape = [self.shape[_] for _ in indies]
+        back_shape[0] = tmp.shape[0]
+        return np.reshape(tmp, back_shape).transpose(indies)
+
+    def __eq__(self, other):
         t1 = self.data.reshape(-1)
         t2 = other.data.reshape(-1)
         if len(t1) != len(t2):

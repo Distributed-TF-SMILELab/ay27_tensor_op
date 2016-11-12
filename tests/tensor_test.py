@@ -3,7 +3,6 @@ import unittest
 from functools import reduce
 
 import numpy as np
-import tensorflow as tf
 from src.tensor import Tensor
 
 
@@ -23,35 +22,38 @@ class TensorTest(np.testing.TestCase):
 
     def test_t2mat(self):
 
-        s = tf.Session()
-        with s.as_default():
-            # mode-1
-            Y = np.transpose(self.X, [0, 2, 1])
-            Z = Y.reshape([3, 8])
-            np.testing.assert_array_equal(Z, self.t.t2mat(0, [2, 1]).eval())
+        # mode-1
+        Y = np.transpose(self.X, [0, 2, 1])
+        Z = Y.reshape([3, 8])
+        np.testing.assert_array_equal(Z, self.t.t2mat(0, [2, 1]))
 
-            # mode-2
-            Y = np.transpose(self.X, [1, 2, 0])
-            Z = Y.reshape([4, 6])
-            np.testing.assert_array_equal(Z, self.t.t2mat(1, [2, 0]).eval())
+        # mode-2
+        Y = np.transpose(self.X, [1, 2, 0])
+        Z = Y.reshape([4, 6])
+        np.testing.assert_array_equal(Z, self.t.t2mat(1, [2, 0]))
 
-            # mode-3
-            Y = np.transpose(self.X, [2, 1, 0])
-            Z = Y.reshape([2, 12])
-            np.testing.assert_array_equal(Z, self.t.t2mat(2, [1, 0]).eval())
+        # mode-3
+        Y = np.transpose(self.X, [2, 1, 0])
+        Z = Y.reshape([2, 12])
+        np.testing.assert_array_equal(Z, self.t.t2mat(2, [1, 0]))
 
     def test_err(self):
         try:
-            self.t.t2mat([2, 3], [4, 5]).eval()
+            self.t.t2mat([2, 3], [4, 5])
         except:
             self.assertTrue(True)
 
         try:
-            self.t.t2mat(3, [0, 1, 2]).eval()
+            self.t.t2mat(3, [0, 1, 2])
         except:
             self.assertTrue(True)
 
-    def test_reverse(self):
+        try:
+            self.t.t2mat('sad', 123)
+        except ValueError:
+            self.assertTrue(True)
+
+    def test_tmul(self):
         # 2x4
         U = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
 
@@ -66,6 +68,9 @@ class TensorTest(np.testing.TestCase):
         Z_ = U.dot(Z_)  # 2x6
         reverse2 = np.transpose(Z_.reshape([2, 3, 2]), [1, 0, 2])  # 2x6 => 2x3x2 => 3x2x2
 
+        result = self.t.tmul(U, 1)
+        np.testing.assert_array_equal(reverse2, result)
+
         np.testing.assert_array_equal(reverse1, reverse2)
 
     def test_norm(self):
@@ -76,7 +81,19 @@ class TensorTest(np.testing.TestCase):
         self.assertAlmostEqual(pow(self.t.norm(4), 4), x)
 
     def test_inner(self):
-        pass
+        tmp = np.random.randn(3, 4, 2)
+        r1 = tmp.reshape(-1).dot(self.X.reshape(-1).T)
+
+        r2 = self.t.inner(Tensor(tmp))
+
+        self.assertAlmostEqual(r1, r2)
+
+    def test_cmp(self):
+        tmp = Tensor(np.random.randn(3, 4, 2))
+        self.assertNotEqual(self.t, tmp)
+        tmp = Tensor(self.tmp)
+        self.assertEqual(self.t, tmp)
+
 
 if __name__ == '__main__':
     unittest.main()
