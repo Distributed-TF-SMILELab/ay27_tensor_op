@@ -1,5 +1,6 @@
 # Created by ay27 at 16/11/8
 import numpy as np
+import tensorflow as tf
 from src.checker import type_check
 
 
@@ -29,7 +30,7 @@ class Tensor:
         else:
             indies.extend(cdims)
             csize = np.prod([self.shape[i] for i in cdims])
-        tmp = np.reshape(np.transpose(self.data, indies), (rsize, csize))
+        tmp = tf.reshape(tf.transpose(self.data, indies), (rsize, csize))
 
         return tmp
 
@@ -45,15 +46,18 @@ class Tensor:
         return pow(np.sum(np.power(self.vectorization(), p)), 1.0 / p)
 
     @type_check(None, [np.ndarray, np.matrix], int)
-    def tmul(self, U, axis=0):
+    def ttm(self, U, axis=0):
         indies = list(range(len(self.shape)))
         indies[0], indies[axis] = indies[axis], indies[0]
 
-        tmp = self.t2mat(axis, indies[1:])
+        tmp = self.t2mat(axis, indies[1:]).eval()
         tmp = np.matmul(U, tmp)
         back_shape = [self.shape[_] for _ in indies]
         back_shape[0] = tmp.shape[0]
         return np.reshape(tmp, back_shape).transpose(indies)
+
+    def ttt(self, T, axis=None):
+        pass
 
     def __eq__(self, other):
         t1 = self.data.reshape(-1)
@@ -64,3 +68,22 @@ class Tensor:
             if t1[ii] != t2[ii]:
                 return False
         return True
+
+    def __repr__(self):
+        if len(self.shape) < 3:
+            return str(self.data)
+
+        import itertools
+        prod = 'itertools.product('
+        fmt = 'self.data[:,:'
+        for ii in range(len(self.shape) - 2):
+            prod += 'range(%d),' % self.shape[ii + 2]
+            fmt += ',%d'
+        fmt += ']'
+        prod = prod[0:-1] + ')'
+
+        result = ''
+        for t in eval(prod):
+            tmp = fmt % t
+            result += tmp[9:] + '\n' + str(eval(tmp)) + '\n'
+        return result

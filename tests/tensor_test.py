@@ -3,6 +3,7 @@ import unittest
 from functools import reduce
 
 import numpy as np
+import tensorflow as tf
 from src.tensor import Tensor
 
 
@@ -22,34 +23,36 @@ class TensorTest(np.testing.TestCase):
 
     def test_t2mat(self):
 
-        # mode-1
-        Y = np.transpose(self.X, [0, 2, 1])
-        Z = Y.reshape([3, 8])
-        np.testing.assert_array_equal(Z, self.t.t2mat(0, [2, 1]))
+        s = tf.Session()
+        with s.as_default():
+            # mode-1
+            Y = np.transpose(self.X, [0, 2, 1])
+            Z = Y.reshape([3, 8])
+            np.testing.assert_array_equal(Z, self.t.t2mat(0, [2, 1]).eval())
 
-        # mode-2
-        Y = np.transpose(self.X, [1, 2, 0])
-        Z = Y.reshape([4, 6])
-        np.testing.assert_array_equal(Z, self.t.t2mat(1, [2, 0]))
+            # mode-2
+            Y = np.transpose(self.X, [1, 2, 0])
+            Z = Y.reshape([4, 6])
+            np.testing.assert_array_equal(Z, self.t.t2mat(1, [2, 0]).eval())
 
-        # mode-3
-        Y = np.transpose(self.X, [2, 1, 0])
-        Z = Y.reshape([2, 12])
-        np.testing.assert_array_equal(Z, self.t.t2mat(2, [1, 0]))
+            # mode-3
+            Y = np.transpose(self.X, [2, 1, 0])
+            Z = Y.reshape([2, 12])
+            np.testing.assert_array_equal(Z, self.t.t2mat(2, [1, 0]).eval())
 
     def test_err(self):
         try:
-            self.t.t2mat([2, 3], [4, 5])
+            self.t.t2mat([2, 3], [4, 5]).eval()
         except:
             self.assertTrue(True)
 
         try:
-            self.t.t2mat(3, [0, 1, 2])
+            self.t.t2mat(3, [0, 1, 2]).eval()
         except:
             self.assertTrue(True)
 
         try:
-            self.t.t2mat('sad', 123)
+            self.t.t2mat('sad', 123).eval()
         except ValueError:
             self.assertTrue(True)
 
@@ -68,8 +71,10 @@ class TensorTest(np.testing.TestCase):
         Z_ = U.dot(Z_)  # 2x6
         reverse2 = np.transpose(Z_.reshape([2, 3, 2]), [1, 0, 2])  # 2x6 => 2x3x2 => 3x2x2
 
-        result = self.t.tmul(U, 1)
-        np.testing.assert_array_equal(reverse2, result)
+        s = tf.Session()
+        with s.as_default():
+            result = self.t.tmul(U, 1)
+            np.testing.assert_array_equal(reverse2, result)
 
         np.testing.assert_array_equal(reverse1, reverse2)
 
