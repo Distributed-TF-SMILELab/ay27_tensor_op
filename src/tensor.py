@@ -7,11 +7,15 @@ from src.checker import type_check
 class Tensor:
     @type_check(None, [np.ndarray, np.matrix, list])
     def __init__(self, data):
-        self.data = np.array(data, dtype=np.float64)
+        self.data = np.array(data)
         self.shape = self.data.shape
         self.__vec__ = None
 
     def vectorization(self):
+        """
+        the __vec__ is bound with self.data
+        :return:
+        """
         if self.__vec__ is None:
             self.__vec__ = self.data.reshape(-1)
         return self.__vec__
@@ -43,7 +47,17 @@ class Tensor:
 
     @type_check(None, int)
     def norm(self, p=2):
-        return pow(np.sum(np.power(self.vectorization(), p)), 1.0 / p)
+        """
+        :param p: {non-zero int, inf, -inf, 'fro', 'nuc'}, optional
+        Order of the norm (see table under ``Notes``). inf means numpy's
+        `inf` object.
+        :return:
+        """
+        return np.linalg.norm(self.vectorization(), p)
+
+    @type_check(None, [np.ndarray, np.matrix], int)
+    def ttv(self, vec, axis=0):
+        return self.ttm(np.reshape(vec, [1, vec.shape[0]]), axis)
 
     @type_check(None, [np.ndarray, np.matrix], int)
     def ttm(self, U, axis=0):
@@ -54,20 +68,16 @@ class Tensor:
         tmp = np.matmul(U, tmp)
         back_shape = [self.shape[_] for _ in indies]
         back_shape[0] = tmp.shape[0]
-        return np.reshape(tmp, back_shape).transpose(indies)
+        result = np.reshape(tmp, back_shape).transpose(indies)
+        # del the 1-dim
+        shape = [_ for _ in result.shape if _ > 1]
+        return result.reshape(shape)
 
-    def ttt(self, T, axis=None):
+    def ttt(self, tensor, axis=0):
         pass
 
     def __eq__(self, other):
-        t1 = self.data.reshape(-1)
-        t2 = other.data.reshape(-1)
-        if len(t1) != len(t2):
-            return False
-        for ii in range(len(t1)):
-            if t1[ii] != t2[ii]:
-                return False
-        return True
+        return np.array_equal(self.data, other.data)
 
     def __repr__(self):
         if len(self.shape) < 3:

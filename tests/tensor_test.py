@@ -56,7 +56,7 @@ class TensorTest(np.testing.TestCase):
         except ValueError:
             self.assertTrue(True)
 
-    def test_tmul(self):
+    def test_ttm(self):
         # 2x4
         U = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
 
@@ -73,10 +73,16 @@ class TensorTest(np.testing.TestCase):
 
         s = tf.Session()
         with s.as_default():
-            result = self.t.tmul(U, 1)
+            result = self.t.ttm(U, 1)
             np.testing.assert_array_equal(reverse2, result)
 
         np.testing.assert_array_equal(reverse1, reverse2)
+
+        U = np.array([1, 2, 3, 4])
+        ground_true = [[70, 190], [80, 200], [90, 210]]
+        with s.as_default():
+            result = self.t.ttv(U, 1)
+            np.testing.assert_array_equal(result, ground_true)
 
     def test_norm(self):
         x = reduce(lambda x, y: x + y, np.power(self.X.reshape(-1), 2))
@@ -99,6 +105,17 @@ class TensorTest(np.testing.TestCase):
         tmp = Tensor(self.tmp)
         self.assertEqual(self.t, tmp)
 
+    def test_print(self):
+        groud = '[:,:,0]\n'\
+                '[[ 1  4  7 10]\n'\
+                ' [ 2  5  8 11]\n' \
+                ' [ 3  6  9 12]]\n'\
+                '[:,:,1]\n'\
+                '[[13 16 19 22]\n'\
+                ' [14 17 20 23]\n' \
+                ' [15 18 21 24]]\n'
+        result = self.t.__repr__()
+        self.assertEqual(groud, result)
 
 if __name__ == '__main__':
     unittest.main()
