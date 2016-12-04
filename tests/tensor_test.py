@@ -74,7 +74,7 @@ class TensorTest(np.testing.TestCase):
         s = tf.Session()
         with s.as_default():
             result = self.t.ttm(U, 1)
-            np.testing.assert_array_equal(reverse2, result)
+            np.testing.assert_array_equal(reverse2, result.data)
 
         np.testing.assert_array_equal(reverse1, reverse2)
 
@@ -82,7 +82,19 @@ class TensorTest(np.testing.TestCase):
         ground_true = [[70, 190], [80, 200], [90, 210]]
         with s.as_default():
             result = self.t.ttv(U, 1)
-            np.testing.assert_array_equal(result, ground_true)
+            np.testing.assert_array_equal(result.data, ground_true)
+
+            result = self.t.ttm(U, 1)
+            np.testing.assert_array_almost_equal(result.data.reshape(-1), np.array(ground_true).reshape(-1))
+
+        U = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+        with s.as_default():
+            result = self.t.ttm(U, 0)
+            tmp = [[[14, 86], [32, 104], [50, 122], [68, 140]],
+                   [[32, 212], [77, 257], [122, 302], [167, 347]],
+                   [[50, 338], [122, 410], [194, 482], [266, 554]],
+                   [[68, 464], [167, 563], [266, 662], [365, 761]]]
+            np.testing.assert_array_almost_equal(result.data, tmp)
 
     def test_ttt(self):
         # t: 3x4x2, t1: 4x2x3

@@ -62,6 +62,9 @@ class Tensor:
 
     @type_check(None, [np.ndarray, np.matrix], int)
     def ttm(self, U, axis=0):
+        if len(U.shape) == 1:
+            return self.ttv(U, axis)
+
         indies = list(range(len(self.shape)))
         indies[0], indies[axis] = indies[axis], indies[0]
 
@@ -72,7 +75,7 @@ class Tensor:
         result = np.reshape(tmp, back_shape).transpose(indies)
         # del the 1-dim
         shape = [_ for _ in result.shape if _ > 1]
-        return result.reshape(shape)
+        return Tensor(result.reshape(shape))
 
     @type_check(None, None, [int, list, tuple], [int, list, tuple])
     def ttt(self, tensor, adims=0, bdims=0):
