@@ -60,8 +60,28 @@ class Tensor:
     def ttv(self, vec, axis=0):
         return self.ttm(np.reshape(vec, [1, vec.shape[0]]), axis)
 
+    @type_check(None, [np.ndarray, np.matrix, list], [int, list])
+    def ttm(self, U, axis=0, transpose=False):
+        if axis == -1:
+            axis = list(range(len(U)))
+        if isinstance(U, list):
+            if transpose:
+                tmp = self.__ttm(U[axis[0]].T, axis[0])
+                for ii in range(1, len(U)):
+                    tmp = tmp.__ttm(U[axis[ii]].T, axis[ii])
+            else:
+                tmp = self.__ttm(U[axis[0]], axis[0])
+                for ii in range(1, len(U)):
+                    tmp = tmp.__ttm(U[axis[ii]], axis[ii])
+            return tmp
+        else:
+            if transpose:
+                return self.__ttm(U.T, axis)
+            else:
+                return self.__ttm(U, axis)
+
     @type_check(None, [np.ndarray, np.matrix], int)
-    def ttm(self, U, axis=0):
+    def __ttm(self, U, axis=0):
         if len(U.shape) == 1:
             return self.ttv(U, axis)
 

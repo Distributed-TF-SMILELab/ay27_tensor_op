@@ -46,13 +46,8 @@ def HOSVD(tensor):
         U = U[:, 0:10]
         Us.append(U)
 
-    g = tensor.ttm(Us[0].T, 0)
-    for ii in range(1, order):
-        g = g.ttm(Us[ii].T, ii)
-
-    xx = g.ttm(Us[0], 0)
-    for ii in range(1, order):
-        xx = xx.ttm(Us[ii], ii)
+    g = tensor.ttm(Us, -1, transpose=True)
+    xx = g.ttm(Us, -1)
     return g, Us, validator.RMSE(tensor, xx)
 
 
@@ -73,12 +68,7 @@ def HOOI(tensor, R=10, iters=20, tol=1e-10):
                 y = y.ttm(Us[k].T, k)
             U, _, _ = np.linalg.svd(y.t2mat(ii, list(set(list(range(order))) - {ii})).eval())
             Us[ii] = U[:, 0:R]
-    g = tensor.ttm(Us[0].T, 0)
-    for ii in range(1, order):
-        g = g.ttm(Us[ii].T, ii)
 
-    xx = g.ttm(Us[0], 0)
-    for ii in range(1, order):
-        xx = xx.ttm(Us[ii], ii)
-
+    g = tensor.ttm(Us, -1, True)
+    xx = g.ttm(Us, -1)
     return g, validator.RMSE(xx, tensor)
