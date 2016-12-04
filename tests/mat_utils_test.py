@@ -7,8 +7,8 @@ import time
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
-        self.A = np.random.randn(40, 30)
-        self.B = np.random.randn(20, 30)
+        self.A = np.random.randn(4, 3)
+        self.B = np.random.randn(2, 3)
 
     def test_kroncker(self):
         res = utils.kron(self.A, self.B)
@@ -28,6 +28,16 @@ class MyTestCase(unittest.TestCase):
                 for jj in range(self.B.shape[0]):
                     tmp[ii * self.B.shape[0] + jj, kk] = self.A[ii, kk] * self.B[jj, kk]
         np.testing.assert_array_almost_equal(res, tmp)
+
+    def test_hadamard(self):
+        A = np.random.randn(30, 40)
+        B = np.random.randn(30, 40)
+        res = utils.hadamard(A, B)
+        tmp = np.zeros((30, 40))
+        for ii in range(30):
+            for jj in range(40):
+                tmp[ii, jj] = A[ii, jj] * B[ii, jj]
+        np.testing.assert_array_almost_equal(tmp, res)
 
     def test_err(self):
         with self.assertRaises(ValueError):

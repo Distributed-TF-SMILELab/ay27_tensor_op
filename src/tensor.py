@@ -7,7 +7,7 @@ from src.checker import type_check
 class Tensor:
     @type_check(None, [np.ndarray, np.matrix, list])
     def __init__(self, data):
-        self.data = np.array(data)
+        self.data = np.copy(np.array(data))
         self.shape = self.data.shape
         self.__vec__ = None
 
@@ -32,9 +32,10 @@ class Tensor:
             indies.append(cdims)
             csize = self.shape[cdims]
         else:
-            indies.extend(cdims)
+            indies = indies + cdims
+            # indies.extend(cdims)
             csize = np.prod([self.shape[i] for i in cdims])
-        tmp = tf.reshape(tf.transpose(self.data, indies), (rsize, csize))
+        tmp = tf.reshape(tf.transpose(self.data, indies), (int(rsize), int(csize)))
 
         return tmp
 
@@ -73,8 +74,22 @@ class Tensor:
         shape = [_ for _ in result.shape if _ > 1]
         return result.reshape(shape)
 
-    def ttt(self, tensor, axis=0):
-        pass
+    @type_check(None, None, [int, list, tuple], [int, list, tuple])
+    def ttt(self, tensor, adims=0, bdims=0):
+        if isinstance(adims, int):
+            adims = [adims]
+        if isinstance(bdims, int):
+            bdims = [bdims]
+        adims = list(adims)
+        bdims = list(bdims)
+        if len(adims) != len(bdims):
+            raise ValueError('the len of adims and bdims must be equal')
+        r1 = list(set(range(len(self.shape))) - set(adims))
+        r2 = list(set(range(len(tensor.shape))) - set(bdims))
+        a = self.t2mat(adims, r1).eval()
+        b = tensor.t2mat(bdims, r2).eval()
+        c = np.matmul(a.T, b)
+        return Tensor(np.reshape(c, [self.shape[_] for _ in r1] + [tensor.shape[_] for _ in r2]))
 
     def __eq__(self, other):
         return np.array_equal(self.data, other.data)

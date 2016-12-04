@@ -84,6 +84,24 @@ class TensorTest(np.testing.TestCase):
             result = self.t.ttv(U, 1)
             np.testing.assert_array_equal(result, ground_true)
 
+    def test_ttt(self):
+        # t: 3x4x2, t1: 4x2x3
+        with tf.Session().as_default():
+            t1 = Tensor(self.t.data.transpose([1, 2, 0]))
+            tmp = t1.ttt(self.t, [2, 0], [0, 1])
+            ans = [[650, 1586], [1586, 4250]]
+            np.testing.assert_array_almost_equal(tmp.data, ans)
+
+            tmp = t1.ttt(self.t, [2, 0, 1], [0, 1, 2])
+            ans = [4900]
+            np.testing.assert_array_almost_equal(tmp.data, ans)
+
+            ans = [[1436, 1528, 1620],
+                   [1528, 1628, 1728],
+                   [1620, 1728, 1836]]
+            tmp = t1.ttt(self.t, [0, 1], [1, 2])
+            np.testing.assert_array_almost_equal(tmp.data, ans)
+
     def test_norm(self):
         x = reduce(lambda x, y: x + y, np.power(self.X.reshape(-1), 2))
         self.assertEqual(pow(self.t.norm(), 2), x)
@@ -106,16 +124,17 @@ class TensorTest(np.testing.TestCase):
         self.assertEqual(self.t, tmp)
 
     def test_print(self):
-        groud = '[:,:,0]\n'\
-                '[[ 1  4  7 10]\n'\
+        groud = '[:,:,0]\n' \
+                '[[ 1  4  7 10]\n' \
                 ' [ 2  5  8 11]\n' \
-                ' [ 3  6  9 12]]\n'\
-                '[:,:,1]\n'\
-                '[[13 16 19 22]\n'\
+                ' [ 3  6  9 12]]\n' \
+                '[:,:,1]\n' \
+                '[[13 16 19 22]\n' \
                 ' [14 17 20 23]\n' \
                 ' [15 18 21 24]]\n'
         result = self.t.__repr__()
         self.assertEqual(groud, result)
+
 
 if __name__ == '__main__':
     unittest.main()
