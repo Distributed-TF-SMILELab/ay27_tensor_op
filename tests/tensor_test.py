@@ -96,6 +96,10 @@ class TensorTest(np.testing.TestCase):
                    [[68, 464], [167, 563], [266, 662], [365, 761]]]
             np.testing.assert_array_almost_equal(result.data, tmp)
 
+            U = np.random.rand(3,2)
+            result = self.t.ttm(U.T, 0)
+            print(result)
+
     def test_ttt(self):
         # t: 3x4x2, t1: 4x2x3
         with tf.Session().as_default():

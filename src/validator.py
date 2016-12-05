@@ -10,14 +10,18 @@ import numpy as np
 
 
 def RMSE(A, B):
-    if isinstance(A, Tensor) and isinstance(B, Tensor):
+    if isinstance(A, Tensor):
         a = A.vectorization()
-        b = B.vectorization()
     else:
         A = np.asanyarray(A)
-        B = np.asanyarray(B)
         a = np.reshape(A, -1)
+
+    if isinstance(B, Tensor):
+        b = B.vectorization()
+    else:
+        B = np.asanyarray(B)
         b = np.reshape(B, -1)
+
     if A.shape != B.shape:
         raise ValueError('the shape of A and B must be equal')
 
