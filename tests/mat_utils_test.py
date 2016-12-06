@@ -7,8 +7,8 @@ import time
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
-        self.A = np.random.randn(4, 3)
-        self.B = np.random.randn(2, 3)
+        self.A = np.random.rand(4, 3)
+        self.B = np.random.rand(2, 3)
 
     def test_kroncker(self):
         res = utils.kron(self.A, self.B)
@@ -30,8 +30,8 @@ class MyTestCase(unittest.TestCase):
         np.testing.assert_array_almost_equal(res, tmp)
 
     def test_hadamard(self):
-        A = np.random.randn(30, 40)
-        B = np.random.randn(30, 40)
+        A = np.random.rand(30, 40)
+        B = np.random.rand(30, 40)
         res = utils.hadamard(A, B)
         tmp = np.zeros((30, 40))
         for ii in range(30):
@@ -41,7 +41,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_err(self):
         with self.assertRaises(ValueError):
-            utils.khatriRao(np.random.randn(2, 3), np.random.randn(3, 4))
+            utils.khatriRao(np.random.rand(2, 3), np.random.rand(3, 4))
 
 
 if __name__ == '__main__':

@@ -4,9 +4,9 @@ import numpy as np
 from src import validator
 from src.checker import type_check
 from src.tensor import Tensor
-import src.mat_utils as utils
 
 
+@type_check(Tensor)
 def HOSVD(tensor):
     order = len(tensor.shape)
     Us = []
@@ -21,9 +21,11 @@ def HOSVD(tensor):
     return g, Us, validator.RMSE(tensor, xx)
 
 
-def HOOI(tensor, R=10, iters=20, tol=1e-10):
+@type_check(Tensor)
+def HOOI(tensor, R=10, iters=20, tol=1e-2):
     g, Us, _ = HOSVD(tensor)
     order = len(tensor.shape)
+    rmse = 0.0
     for iter in range(iters):
         for ii in range(order):
             if ii == 0:
@@ -41,5 +43,9 @@ def HOOI(tensor, R=10, iters=20, tol=1e-10):
 
         g = tensor.ttm(Us, -1, True)
         xx = g.ttm(Us, -1)
-        print('iter %d, rmse=%f' % (iter, validator.RMSE(xx, tensor)))
-    return g, validator.RMSE(xx, tensor)
+        rmse_n = validator.RMSE(xx, tensor)
+        print('iter %d, rmse=%f' % (iter, rmse_n))
+        if abs(abs(rmse_n - rmse) - tol) < tol:
+            return g, rmse_n
+        rmse = rmse_n
+    return g, rmse_n

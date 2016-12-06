@@ -10,8 +10,8 @@ from src.validator import RMSE
 
 class MyTestCase(unittest.TestCase):
     def test_rmse(self):
-        a = Tensor(np.random.randn(30, 20))
-        b = Tensor(np.random.randn(30, 20))
+        a = Tensor(np.random.rand(30, 20))
+        b = Tensor(np.random.rand(30, 20))
         ans = RMSE(a, b)
         tmp = 0.0
         for ii in range(a.shape[0]):

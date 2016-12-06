@@ -98,7 +98,7 @@ class TensorTest(np.testing.TestCase):
 
             U = np.random.rand(3,2)
             result = self.t.ttm(U.T, 0)
-            print(result)
+            # print(result)
 
     def test_ttt(self):
         # t: 3x4x2, t1: 4x2x3
@@ -126,7 +126,7 @@ class TensorTest(np.testing.TestCase):
         self.assertAlmostEqual(pow(self.t.norm(4), 4), x)
 
     def test_inner(self):
-        tmp = np.random.randn(3, 4, 2)
+        tmp = np.random.rand(3, 4, 2)
         r1 = tmp.reshape(-1).dot(self.X.reshape(-1).T)
 
         r2 = self.t.inner(Tensor(tmp))
@@ -134,7 +134,7 @@ class TensorTest(np.testing.TestCase):
         self.assertAlmostEqual(r1, r2)
 
     def test_cmp(self):
-        tmp = Tensor(np.random.randn(3, 4, 2))
+        tmp = Tensor(np.random.rand(3, 4, 2))
         self.assertNotEqual(self.t, tmp)
         tmp = Tensor(self.tmp)
         self.assertEqual(self.t, tmp)
