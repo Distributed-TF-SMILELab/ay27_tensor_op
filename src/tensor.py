@@ -6,9 +6,13 @@ from src.checker import type_check
 
 class Tensor:
     @type_check(None, [np.ndarray, np.matrix, list])
-    def __init__(self, data):
+    def __init__(self, data, shape=None):
         self.data = np.copy(np.array(data))
-        self.shape = self.data.shape
+        if shape is None:
+            self.shape = self.data.shape
+        else:
+            self.data = self.data.reshape(shape)
+            self.shape = shape
         self.__vec__ = None
 
     def vectorization(self):

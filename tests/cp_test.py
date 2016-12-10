@@ -3,7 +3,7 @@ import numpy as np
 
 from src import validator
 from src.tensor import Tensor
-from src.cp import cp_als
+from src.cp import cp_als, cp
 import unittest
 import math
 from src.validator import RMSE
@@ -29,7 +29,8 @@ class MyTestCase(unittest.TestCase):
             tmp = G.ttm(A, 0).ttm(B, 1).ttm(C, 2)
             tmp.data /= 100.0
             print('empty %f' % validator.RMSE(tmp, Tensor(np.zeros((30, 40, 20)))))
-            As, lamd, rmse = cp_als(tmp)
+            cp_als(tmp, R=20)
+            # As, lamd, rmse = cp_als(tmp, R=2)
 
 
 if __name__ == '__main__':

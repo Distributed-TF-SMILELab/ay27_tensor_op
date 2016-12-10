@@ -40,6 +40,12 @@ class TensorTest(np.testing.TestCase):
             Z = Y.reshape([2, 12])
             np.testing.assert_array_equal(Z, self.t.t2mat(2, [1, 0]).eval())
 
+            # Kolda's method for transpose
+            U = np.random.rand(3, 4, 5, 2)
+            t = U.transpose([2, 3, 1, 0])
+            tt = t.transpose([3, 2, 0, 1])
+            np.testing.assert_array_equal(tt, U)
+
     def test_err(self):
         try:
             self.t.t2mat([2, 3], [4, 5]).eval()
@@ -96,7 +102,7 @@ class TensorTest(np.testing.TestCase):
                    [[68, 464], [167, 563], [266, 662], [365, 761]]]
             np.testing.assert_array_almost_equal(result.data, tmp)
 
-            U = np.random.rand(3,2)
+            U = np.random.rand(3, 2)
             result = self.t.ttm(U.T, 0)
             # print(result)
 
